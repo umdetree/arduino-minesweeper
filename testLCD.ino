@@ -1,8 +1,8 @@
 #include<RSCG12864B.h>
-#include<stdlib.h>
 #include<IRremote.h>
-// #include"board.h"
+#include<stdlib.h>
 #include<string.h>
+
 const int IR_RECV = 6;
 uint16_t cmd;
 typedef unsigned char uchar;
@@ -11,7 +11,6 @@ struct vertex{
   uchar col;
   vertex(): row(0), col(0){}
 };
-
 
 class board{
 struct site{
@@ -24,7 +23,6 @@ struct site{
 };
 private:
     const char* uc2s[10] = {"/","1","2","3","4","5","6","7","8","9"};
-    // / -> SPACE
     site** sites;
     uchar safeSite;
     uchar mines;
@@ -53,7 +51,7 @@ public:
     }
 };
 
-/* 连线：
+/* connection：
 BUSY ---- A3
 SDA ---- A4
 SCL ---- A5
@@ -66,22 +64,19 @@ GND ---- GND
 void print_block(RAYLIDLCD& lcd, unsigned char x, unsigned char y);
 void bomb(RAYLIDLCD& lcd);
 void win(RAYLIDLCD& lcd);
-void draw_cursor();
 void cmd_handler(board* game);
 
 const int busyPin = 7;
 vertex cursor_co = vertex();
-RAYLIDLCD myLCD(busyPin); // 我定义Busy信号到D7（数字口7）
+RAYLIDLCD myLCD(busyPin); //
 
 void setup() {
-
   randomSeed(analogRead(5));
   Serial.begin(9600);
   IrReceiver.begin(IR_RECV, ENABLE_LED_FEEDBACK);
   IrReceiver.enableIRIn();
   myLCD.begin(); 
   myLCD.setBrightness(255);
-
 }
 
 void loop() {
@@ -142,7 +137,6 @@ board::board(uchar row, uchar col, uchar minenum){
         if(sites[p][q].num < 10){
             sites[p][q].num = 10;
             i++;
-
             numset(p - 1, q - 1);
             numset(p ,q - 1);
             numset(p + 1, q - 1);
@@ -161,11 +155,13 @@ board::~board(){
     }
     free(sites);
 }
+
 // this method seems useless
 bool board::isOpen(uchar p, uchar q){
     return sites[p][q].isOpen;
 }
 
+// Warning: stack overflow for dfs
 void board::open(uchar p, uchar q){
     if(p < 0 || p >= m || q < 0 || q >= n) return;
     if(sites[p][q].isOpen || sites[p][q].flag > 0) return;
@@ -180,7 +176,6 @@ void board::open(uchar p, uchar q){
     sites[p][q].isOpen = true;
     this->safeSite++;
     myLCD.print(q * 6, p * 8, uc2s[sites[p][q].num],SMALL);
-    //draw(p, q);
     // recursively open 8 neighbors
     if(sites[p][q].num == 0){
         open(p - 1, q - 1);
@@ -237,10 +232,12 @@ void print_block(RAYLIDLCD& lcd, unsigned char x, unsigned char y){
 
 void bomb(RAYLIDLCD& lcd){
   lcd.print(78,0,"BOMB!!",SMALL);
+  // something else
 }
 
 void win(RAYLIDLCD& lcd){
   lcd.print(78,0,"WIN!!", NORMAL);
+  // something else
 }
 
 void cmd_handler(board* game) // takes action based on IR code received describing Car MP3 IR codes 
@@ -275,11 +272,4 @@ void cmd_handler(board* game) // takes action based on IR code received describi
   default:
     break;
   }
-}
-
-void draw_cursor(){
-  Serial.println("draw_cursor called");
-  uchar p = cursor_co.row;
-  uchar q = cursor_co.col;
-  myLCD.drawRectF(q * 6, p * 8, q * 6 + 5, p * 8 + 7);
 }
