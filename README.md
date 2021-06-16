@@ -1,4 +1,9 @@
 # arduino-minesweeper
 Fudan modern physics experiment
 
-It has some bugs for example the stack overflow of `board::open()`.
+LCD: RSCG12864B
+Remote control: car mp3 remote
+
+`2`, `4`, `6`, `8` : move cursor
+`0` : open site
+'100+' : mark site
